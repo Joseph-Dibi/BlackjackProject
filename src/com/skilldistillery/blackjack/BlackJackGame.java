@@ -9,65 +9,83 @@ import com.skilldistillery.pokerstuff.Deck;
 
 public class BlackJackGame {
 	BlackJackHand cards = new BlackJackHand();
-	Deck deck = new Deck();
 
 	public BlackJackGame() {
-		int deckSize = deck.checkDeckSize();
-		boolean play = true;
-		boolean more = true;
-		while (more) {
-			System.out.println();
-			System.out.println("Welcome to Casino Royale, we just play for fun! (For now).");
-			deck.shuffleDeck();
-			List<Cards> playerHand = new ArrayList<>();
-			playerHand.add(deck.dealCard());
-			playerHand.add(deck.dealCard());
-			List<Cards> dealerHand = new ArrayList<>();
-			dealerHand.add(deck.dealCard());
-			dealerHand.add(deck.dealCard());
-			play = blackJack(playerHand, dealerHand, play);
-			if(play == false) {
-				break;
-			}
-			play = playerTurn(playerHand, dealerHand, play); // Player turn, players cards will be shown then player can hit or
-			if(play == false) { // if you busted out you don't continue to dealer turn.
-				break;// stand.
-			}
-			dealerTurn(dealerHand);// runs dealer turn. dealer plays by blackjack logic.
-			determineWinner(dealerHand, playerHand);
-		}
+		System.out.println("Welcome to Casino Royale, we just play for fun! (For now).");
+		startGame();
 	}
+	public void startGame() {	
+		List<Cards> playerHand = new ArrayList<>();
+		List<Cards> dealerHand = new ArrayList<>();
+			playerHand.clear();
+			dealerHand.clear();
+			Deck deck = new Deck();
+			int deckSize = deck.checkDeckSize();
+			System.out.println("Dealing cards!");
+			deck.shuffleDeck();
+			playerHand.add(deck.dealCard());
+			playerHand.add(deck.dealCard());
+			dealerHand.add(deck.dealCard());
+			dealerHand.add(deck.dealCard());
+			blackJack(playerHand, dealerHand);
+			
+			playerTurn(playerHand, dealerHand, deck); // Player turn, players cards will be shown then player can hit or
+			
+			dealerTurn(dealerHand, deck);// runs dealer turn. dealer plays by blackjack logic.
+			determineWinner(dealerHand, playerHand);
+	}
+	
 
 	private void determineWinner(List<Cards> dealerHand, List<Cards> playerHand) {
 		int playerHandValue = calculateHandValue(playerHand);
 		int dealerHandValue = calculateHandValue(dealerHand);
-		if(playerHandValue > dealerHandValue && playerHandValue < 22) {
+		if (playerHandValue > dealerHandValue && playerHandValue < 22) {
 			System.out.println("Player Wins! Too bad its all for fun...");
-		}
-		else if(playerHandValue < dealerHandValue && dealerHandValue < 22) {
+			playAgain();
+		} else if (playerHandValue < dealerHandValue && dealerHandValue < 22) {
 			System.out.println("Dealer Wins! Aren't you glad it's just a game?");
-		}
-		else 
+			playAgain();
+		} else
 			System.out.println("Push. You tied.");
+			playAgain();
 	}
 
-	private boolean blackJack(List<Cards> playerHand, List<Cards> dealerHand, boolean play) {
+	private void playAgain() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Would you like to play again?\n1. Yes\2. No");
+		int choice = sc.nextInt();
+		sc.nextLine();
+		if (choice == 1) {
+			startGame();
+		}
+		else {
+			System.out.println("Thank you for playing!");
+			sc.close();
+			System.exit(0);
+		}
+	}
+
+	private void blackJack(List<Cards> playerHand, List<Cards> dealerHand) {
 		int playerHandValue = calculateHandValue(playerHand);
 		int dealerHandValue = calculateHandValue(dealerHand);
 		if (playerHandValue == 21 && dealerHandValue != 21) {
 			System.out.println("BLACKJACK! You win!");
-			play = false;
-			return play;
+			playAgain();
+
 		} else if (playerHandValue != 21 && dealerHandValue == 21) {
 			System.out.println("Dealer BLACKJACK! That's rough buddy...");
-			play = false;
-			return play;
+			playAgain();
+
+		} else if (playerHandValue == 21 && dealerHandValue == 21) {
+			System.out.println("Push");
+			playAgain();
+
 		} else {
-			return play;
+
 		}
 	}
 
-	private void dealerTurn(List<Cards> dealerHand) {
+	private void dealerTurn(List<Cards> dealerHand, Deck deck) {
 		displayDealerhand(dealerHand);
 		int handValue = calculateHandValue(dealerHand);
 		if (handValue < 17) {
@@ -94,11 +112,11 @@ public class BlackJackGame {
 		System.out.println("Dealer is showing: " + cardValue);
 	}
 
-	private boolean playerTurn(List<Cards> playerHand, List<Cards> dealerHand, boolean play) {
+	private void playerTurn(List<Cards> playerHand, List<Cards> dealerHand, Deck deck) {
 		Scanner sc = new Scanner(System.in);
 		displayDealerFirstCard(dealerHand);
 		displayPlayerHand(playerHand);
-		System.out.println("What would you like to do next?\n1. Hit\n2.Stand");
+		System.out.println("What would you like to do next?\n1. Hit\n2. Stand");
 		int choice = sc.nextInt();
 		sc.nextLine();
 		do {
@@ -108,8 +126,7 @@ public class BlackJackGame {
 				int handValue = calculateHandValue(playerHand);
 				if (handValue > 21) {
 					System.out.println("You bust out with a hand value of: " + handValue);
-					play = false;
-					break;
+					playAgain();
 				} else {
 					displayPlayerHand(playerHand);
 					System.out.println("Hit again?\n1.Yes\n2.No");
@@ -119,7 +136,6 @@ public class BlackJackGame {
 				}
 			}
 		} while (choice != 2);
-		return play;
 
 	}
 
@@ -146,4 +162,5 @@ public class BlackJackGame {
 		}
 		return cardValue;
 	}
+
 }
