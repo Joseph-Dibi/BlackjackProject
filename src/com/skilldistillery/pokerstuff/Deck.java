@@ -8,22 +8,32 @@ public class Deck {
 	List<Cards> deck = new ArrayList<>();
 	
 	public Deck() {
-		for(Rank r: Rank.values()) {
-			Cards spades = new Cards(Suit.SPADES, r);
+		Rank[] rank = Rank.values();
+		for (int i = 0; i < rank.length - 1; i++) {
+			Rank rankTemp = rank[i];
+			Cards spades = new Cards(Suit.HEARTS, rank[i]);
 			deck.add(spades);
+			
 		}
-		for(Rank r: Rank.values()) {
-			Cards hearts = new Cards(Suit.HEARTS, r);
-			deck.add(hearts);
+		for (int i = 0; i < rank.length - 1; i++) {
+			Rank rankTemp = rank[i];
+			Cards spades = new Cards(Suit.HEARTS, rank[i]);
+			deck.add(spades);
+			
 		}
-		for(Rank r: Rank.values()) {
-			Cards clubs = new Cards(Suit.CLUBS, r);
-			deck.add(clubs);
+		for (int i = 0; i < rank.length - 1; i++) {
+			Rank rankTemp = rank[i];
+			Cards spades = new Cards(Suit.HEARTS, rank[i]);
+			deck.add(spades);
+			
 		}
-		for(Rank r: Rank.values()) {
-			Cards diamonds = new Cards(Suit.DIAMONDS, r);
-			deck.add(diamonds);
+		for (int i = 0; i < rank.length - 1; i++) {
+			Rank rankTemp = rank[i];
+			Cards spades = new Cards(Suit.HEARTS, rank[i]);
+			deck.add(spades);
+			
 		}
+		
 	}
 	
 	public int checkDeckSize(){
