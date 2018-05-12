@@ -12,7 +12,7 @@ public class BlackJackGame {
 	// BlackJackHand cards = new BlackJackHand();
 
 	public BlackJackGame() {
-		System.out.println("Welcome to Casino Royale, we just play for fun! (For now).");
+		System.out.println("Welcome to Casino Royale, we just play for your real fake money.");
 		PlayerPurse gamblingMoney = new PlayerPurse(1000);
 		startGame(gamblingMoney);
 	}
@@ -42,6 +42,7 @@ public class BlackJackGame {
 		playerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
+		
 		blackJack(playerHand, dealerHand, money, betAmount, sc);
 
 		playerTurn(playerHand, dealerHand, deck, money, betAmount, sc); // Player turn, players cards will be shown then
@@ -118,31 +119,32 @@ public class BlackJackGame {
 	}
 
 	private void dealerTurn(List<Cards> dealerHand, Deck deck, PlayerPurse money, double betAmount) {
-		displayDealerhand(dealerHand);
+		displayDealerHand(dealerHand);
 		int handValue = calculateHandValue(dealerHand);
+		
 		if (handValue < 17) {
 			while (handValue < 17) {
 				System.out.println("Dealer hits.");
 				dealerHand.add(deck.dealCard());
 				handValue = calculateHandValue(dealerHand);
 				if (handValue > 21) {
-					System.out.println("The Dealer is showing: " + handValue);
+					displayDealerHand(dealerHand);
 					System.out.println("Dealer Busts!");
 					money.setMoney(money.getMoney() + (2*betAmount));
 					playAgain(money);
 				}
 			}
-			displayDealerhand(dealerHand);
+			displayDealerHand(dealerHand);
 		}
 	}
 
-	private void displayDealerhand(List<Cards> dealerHand) {
+	private void displayDealerHand(List<Cards> dealerHand) {
 		int cardValue = 0;
 		for (int i = 0; i < dealerHand.size(); i++) {
-			System.out.println("The Dealer is showing: " + dealerHand.get(i).toString());
+			System.out.println("The Dealer has the: " + dealerHand.get(i).toString());
 			cardValue += dealerHand.get(i).getValue();
 		}
-		System.out.println("Dealer is showing: " + cardValue);
+		System.out.println("The Dealer is showing: " + cardValue);
 	}
 
 	private void playerTurn(List<Cards> playerHand, List<Cards> dealerHand, Deck deck, PlayerPurse money,
@@ -188,7 +190,7 @@ public class BlackJackGame {
 	private void displayPlayerHand(List<Cards> playerHand) {// Displays player hand
 		int cardValue = 0;
 		for (Cards cards : playerHand) {
-			System.out.println("You have the " + cards.toString());
+			System.out.println("You have the: " + cards.toString());
 			cardValue += cards.getValue();
 		}
 		System.out.println("You are showing: " + cardValue);
