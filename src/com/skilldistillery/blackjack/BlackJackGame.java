@@ -36,6 +36,12 @@ public class BlackJackGame {
 		System.out.println("You bet: $" + betAmount + ". You have $" + money.getMoney() + " left.");
 
 		Deck deck = new Deck();
+		System.out.println("How many decks would you like to play with?");
+		int deckAmount = sc.nextInt();
+		sc.nextLine();
+		for(int i = 0; i < deckAmount; i++) {
+			deck.addDeck();
+		}
 		int deckSize = deck.checkDeckSize();
 		System.out.println(deckSize);
 		System.out.println("Dealing cards!");
@@ -44,9 +50,9 @@ public class BlackJackGame {
 		playerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
-		doubleAceCheck(playerHand);
+		doubleAceCheck(playerHand);// checks if player or dealer have two aces to start. one is automatically set low if so.
 		doubleAceCheck(dealerHand);
-		blackJack(playerHand, dealerHand, money, betAmount, sc);
+		blackJack(playerHand, dealerHand, money, betAmount, sc);// checks for dealer/player blackjack.
 
 		playerTurn(playerHand, dealerHand, deck, money, betAmount, sc); // Player turn, players cards will be shown then
 		// player can hit or
@@ -199,7 +205,7 @@ public class BlackJackGame {
 	private void setAce(List<Cards> playerHand, Scanner sc) {
 		for (Cards cards : playerHand) {
 			if (cards.getRank() == Rank.ACE || cards.getRank() == Rank.ACELOW) {
-				System.out.println("Would you like to set your ace to high or low?\n1. Low\n2. High");
+				System.out.println("Would you like to set your ace low or high?\n1. Low\n2. High");
 				int choice = sc.nextInt();
 				sc.nextLine();
 				if (choice == 2) {

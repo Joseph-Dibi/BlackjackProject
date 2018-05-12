@@ -8,6 +8,9 @@ public class Deck {
 	List<Cards> deck = new ArrayList<>();
 	
 	public Deck() {
+		
+	}
+	public void addDeck() {
 		Rank[] rank = Rank.values();
 		for (int i = 0; i < rank.length - 1; i++) {
 			Rank rankTemp = rank[i];
