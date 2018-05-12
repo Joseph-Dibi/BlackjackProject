@@ -10,30 +10,30 @@ public class Deck {
 	public Deck() {
 		
 	}
+	public void clearDeck() {
+		deck.clear();
+	}
+	
 	public void addDeck() {
 		Rank[] rank = Rank.values();
 		for (int i = 0; i < rank.length - 1; i++) {
-			Rank rankTemp = rank[i];
-			Cards spades = new Cards(Suit.HEARTS, rank[i]);
+			Cards hearts = new Cards(Suit.HEARTS, rank[i]);
+			deck.add(hearts);
+			
+		}
+		for (int i = 0; i < rank.length - 1; i++) {
+			Cards spades = new Cards(Suit.SPADES, rank[i]);
 			deck.add(spades);
 			
 		}
 		for (int i = 0; i < rank.length - 1; i++) {
-			Rank rankTemp = rank[i];
-			Cards spades = new Cards(Suit.HEARTS, rank[i]);
-			deck.add(spades);
+			Cards diamonds = new Cards(Suit.DIAMONDS, rank[i]);
+			deck.add(diamonds);
 			
 		}
 		for (int i = 0; i < rank.length - 1; i++) {
-			Rank rankTemp = rank[i];
-			Cards spades = new Cards(Suit.HEARTS, rank[i]);
-			deck.add(spades);
-			
-		}
-		for (int i = 0; i < rank.length - 1; i++) {
-			Rank rankTemp = rank[i];
-			Cards spades = new Cards(Suit.HEARTS, rank[i]);
-			deck.add(spades);
+			Cards clubs = new Cards(Suit.CLUBS, rank[i]);
+			deck.add(clubs);
 			
 		}
 		
