@@ -32,10 +32,12 @@ public class BlackJackAppTest {
 	}
 	@Test
 	public void two_aces_causes_one_ace_to_equal_eleven() {
-		testList.add(new Cards(Suit.CLUBS, Rank.ACE));
-		testList.add(new Cards(Suit.CLUBS, Rank.TEN));
-		testList.add(new Cards(Suit.CLUBS, Rank.TEN));
-		//assertEquals(calculate), actual);		
+//		testList.add(new Cards(Suit.CLUBS, Rank.ACE));
+//		testList.add(new Cards(Suit.CLUBS, Rank.ACE));
+//		bjg.startGame(money, sc, deck, deckAmount);
+//		bjg.doubleAceCheck(testList);
+//		assertEquals(12, bjg.calculateHandValue(testList));
+//		//assertEquals(calculate), actual);		
 		//assertEquals(Cards, doubleAceCheck());
 	}
 
