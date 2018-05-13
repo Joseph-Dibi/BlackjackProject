@@ -1,5 +1,7 @@
 package com.skilldistillery.pokerstuff;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -23,7 +25,7 @@ public class BlackJackAppTest {
 		bjg = new BlackJackGame();
 		bjg.startGame(money, sc, deck, deckAmount);
 	}
-	
+	////////
 	@After
 	public void tearDown() {
 		bjg = null;
@@ -33,7 +35,7 @@ public class BlackJackAppTest {
 		testList.add(new Cards(Suit.CLUBS, Rank.ACE));
 		testList.add(new Cards(Suit.CLUBS, Rank.TEN));
 		testList.add(new Cards(Suit.CLUBS, Rank.TEN));
-				
+		//assertEquals(calculate), actual);		
 		//assertEquals(Cards, doubleAceCheck());
 	}
 

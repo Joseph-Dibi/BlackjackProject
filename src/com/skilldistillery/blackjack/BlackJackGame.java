@@ -20,18 +20,20 @@ public class BlackJackGame {
 		System.out.println("How many decks would you like to play with?");
 		int deckAmount = sc.nextInt();
 		sc.nextLine();
-		for(int i = 0; i < deckAmount; i++) {
+		for (int i = 0; i < deckAmount; i++) {
 			deck.addDeck();
 		}
 		startGame(gamblingMoney, sc, deck, deckAmount);
 	}
 
 	public void startGame(PlayerPurse money, Scanner sc, Deck deck, int deckAmount) {
-		
+
 		List<Cards> playerHand = new ArrayList<>();
 		List<Cards> dealerHand = new ArrayList<>();
+		List<Cards> splitHand = new ArrayList<>();
 		playerHand.clear();
 		dealerHand.clear();
+		splitHand.clear();
 		System.out.print("You have: $" + money.getMoney() + ". How much would you like to bet?\n$");
 		double betAmount = sc.nextInt();
 		sc.nextLine();
@@ -43,12 +45,11 @@ public class BlackJackGame {
 		money.setMoney(money.getMoney() - betAmount);
 		System.out.println("You bet: $" + betAmount + ". You have $" + money.getMoney() + " left.");
 
-
 		int deckSize = deck.checkDeckSize();
-		if (deckSize < (deckAmount*52)/4) {
+		if (deckSize < (deckAmount * 52) / 4) {
 			System.out.println("Time for a new shoe");
 			deck.clearDeck();
-			for(int i = 0; i < deckAmount; i++) {
+			for (int i = 0; i < deckAmount; i++) {
 				deck.addDeck();
 			}
 		}
@@ -59,15 +60,76 @@ public class BlackJackGame {
 		playerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
-		doubleAceCheck(playerHand);// checks if player or dealer have two aces to start. one is automatically set low if so.
-		doubleAceCheck(dealerHand);
+		splitHandCheck(playerHand, sc, splitHand, deck, betAmount, money);
 		blackJack(playerHand, dealerHand, money, betAmount, sc, deck, deckAmount);// checks for dealer/player blackjack.
-
-		playerTurn(playerHand, dealerHand, deck, money, betAmount, sc, deckAmount); // Player turn, players cards will be shown then
+		doubleAceCheck(playerHand);// checks if player or dealer have two aces to start. one is automatically set
+									// low if so.
+		doubleAceCheck(dealerHand);
+		if (!splitHand.isEmpty()) {
+			playerSplitTurn(splitHand, dealerHand, deck, money, betAmount, sc, deckSize);
+		}
+		playerTurn(playerHand, dealerHand, deck, money, betAmount, sc, deckAmount, splitHand); // Player turn, players
+																								// cards will be shown
+																								// then
 		// player can hit or
 
-		dealerTurn(dealerHand, deck, money, betAmount, sc, deckAmount);// runs dealer turn. dealer plays by blackjack logic.
-		determineWinner(dealerHand, playerHand, money, betAmount, sc, deck, deckAmount);
+		dealerTurn(dealerHand, deck, money, betAmount, sc, deckAmount);// runs dealer turn. dealer plays by blackjack
+																		// logic.
+		determineWinner(dealerHand, playerHand, money, betAmount, sc, deck, deckAmount, splitHand);
+	}
+
+	private void playerSplitTurn(List<Cards> splitHand, List<Cards> dealerHand, Deck deck, PlayerPurse money,
+			double betAmount, Scanner sc, int deckSize) {
+		displayDealerFirstCard(dealerHand);
+		displayPlayerHand(splitHand);
+		System.out.println("What would you like to do next?\n1. Hit\n2. Stand");
+		int choice = sc.nextInt();
+		sc.nextLine();
+		do {
+			if (choice == 1) {
+				Cards hit = deck.dealCard();
+				splitHand.add(hit);
+				displayPlayerHand(splitHand);
+				setAce(splitHand, sc);
+				int handValue = calculateHandValue(splitHand);
+				if (handValue > 21) {
+					System.out.println("You bust out!");
+
+				} else {
+					displayPlayerHand(splitHand);
+					System.out.println("Hit again?\n1.Yes\n2.No");
+					choice = sc.nextInt();
+					sc.nextLine();
+
+				}
+			}
+		} while (choice != 2);
+
+	}
+
+	private void splitHandCheck(List<Cards> playerHand, Scanner sc, List<Cards> splitHand, Deck deck, double betAmount,
+			PlayerPurse money) {
+		if (playerHand.get(0).getRank() == playerHand.get(1).getRank()) {
+			for (Cards cards : splitHand) {
+				System.out.println("You have the " + cards.getRank() + " of " + cards.getSuit());
+			}
+			System.out.println("Would you like to split your hand?");
+			int choice = sc.nextInt();
+			sc.nextLine();
+			if (money.getMoney() - betAmount >= 0 && choice == 1) {
+				money.setMoney(money.getMoney() - betAmount);
+				splitHand.add(playerHand.get(1));
+				playerHand.remove(1);
+				splitHand.add(deck.dealCard());
+				playerHand.add(deck.dealCard());
+
+			} else if (money.getMoney() - betAmount < 0 && choice == 1) {
+				System.out.println("I am sorry, but you do not have enough money to split.");
+			} else {
+
+			}
+		}
+
 	}
 
 	private void doubleAceCheck(List<Cards> playerHand) {
@@ -80,15 +142,24 @@ public class BlackJackGame {
 	}
 
 	private void determineWinner(List<Cards> dealerHand, List<Cards> playerHand, PlayerPurse money, double betAmount,
-			Scanner sc, Deck deck, int deckAmount) {
+			Scanner sc, Deck deck, int deckAmount, List<Cards> splitHand) {
 		int playerHandValue = calculateHandValue(playerHand);
 		int dealerHandValue = calculateHandValue(dealerHand);
+		int splitHandValue = calculateHandValue(splitHand);
+		if (!splitHand.isEmpty()) {
+			if (splitHandValue > dealerHandValue && splitHandValue < 22) {
+				System.out.println("Player Wins!");
+				money.setMoney(money.getMoney() + (betAmount * 2));
+			} else if (splitHandValue < dealerHandValue && dealerHandValue < 22) {
+				System.out.println("Dealer Wins! Better luck next time.");
+			}
+		}
 		if (playerHandValue > dealerHandValue && playerHandValue < 22) {
 			System.out.println("Player Wins!");
 			money.setMoney(money.getMoney() + (betAmount * 2));
 			playAgain(money, deck, sc, deckAmount);
 		} else if (playerHandValue < dealerHandValue && dealerHandValue < 22) {
-			System.out.println("Dealer Wins! Aren't you glad it's just a game?");
+			System.out.println("Dealer Wins! Better luck next time.");
 			if (money.getMoney() == 0) {
 				System.out.println("You're out of cash! Go hit up an ATM.");
 				sc.close();
@@ -144,7 +215,8 @@ public class BlackJackGame {
 		}
 	}
 
-	private void dealerTurn(List<Cards> dealerHand, Deck deck, PlayerPurse money, double betAmount, Scanner sc, int deckAmount) {
+	private void dealerTurn(List<Cards> dealerHand, Deck deck, PlayerPurse money, double betAmount, Scanner sc,
+			int deckAmount) {
 		displayDealerHand(dealerHand);
 		int handValue = calculateHandValue(dealerHand);
 
@@ -175,7 +247,7 @@ public class BlackJackGame {
 	}
 
 	private void playerTurn(List<Cards> playerHand, List<Cards> dealerHand, Deck deck, PlayerPurse money,
-			double betAmount, Scanner sc, int deckAmount) {
+			double betAmount, Scanner sc, int deckAmount, List<Cards> splitHand) {
 		displayDealerFirstCard(dealerHand);
 		displayPlayerHand(playerHand);
 		System.out.println("What would you like to do next?\n1. Hit\n2. Stand");
@@ -190,16 +262,16 @@ public class BlackJackGame {
 				int handValue = calculateHandValue(playerHand);
 				if (handValue > 21) {
 					System.out.println("You bust out!");
-					if (money.getMoney() == 0) {
-						System.out.println("You're out of cash! Go hit up an ATM.");
-						sc.close();
-						System.exit(0);
-					} else {
-						playAgain(money, deck, sc, deckAmount);
+					if (splitHand.isEmpty()) {
+						if (money.getMoney() == 0) {
+							System.out.println("You're out of cash! Go hit up an ATM.");
+							sc.close();
+							System.exit(0);
+						} else {
+							playAgain(money, deck, sc, deckAmount);
+						}
 					}
-
 				} else {
-					displayPlayerHand(playerHand);
 					System.out.println("Hit again?\n1.Yes\n2.No");
 					choice = sc.nextInt();
 					sc.nextLine();
@@ -217,6 +289,7 @@ public class BlackJackGame {
 				int choice = sc.nextInt();
 				sc.nextLine();
 				if (choice == 2) {
+					cards.setRank(Rank.ACE);
 					continue;
 				} else {
 					cards.setRank(Rank.ACELOW);
@@ -232,7 +305,7 @@ public class BlackJackGame {
 				if (cards.getRank() == Rank.ACE) {
 					cards.setRank(Rank.ACELOW);
 					System.out.println("Dealer has set an Ace to one.");
-					if(calculateHandValue(playerHand) < 21) {
+					if (calculateHandValue(playerHand) < 21) {
 						break;
 					}
 				}
