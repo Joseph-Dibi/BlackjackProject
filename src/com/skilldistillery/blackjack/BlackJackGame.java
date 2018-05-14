@@ -8,10 +8,8 @@ import com.skilldistillery.pokerstuff.Cards;
 import com.skilldistillery.pokerstuff.Deck;
 import com.skilldistillery.pokerstuff.PlayerPurse;
 import com.skilldistillery.pokerstuff.Rank;
-import com.skilldistillery.pokerstuff.Suit;
 
 public class BlackJackGame {
-	// BlackJackHand cards = new BlackJackHand();
 
 	public BlackJackGame() {
 		Scanner sc = new Scanner(System.in);
@@ -57,16 +55,15 @@ public class BlackJackGame {
 		System.out.println("There are: " + deckSize + " cards left.");
 		System.out.println("Dealing cards!");
 		deck.shuffleDeck();
-//		playerHand.add(new Cards(Suit.CLUBS, Rank.ACE));
-//		playerHand.add(new Cards(Suit.CLUBS, Rank.ACE));
 		playerHand.add(deck.dealCard());
 		playerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
 		dealerHand.add(deck.dealCard());
+
 		blackJack(playerHand, dealerHand, money, betAmount, sc, deck, deckAmount);// checks for dealer/player blackjack.
 		splitHandCheck(playerHand, sc, splitHand, deck, betAmount, money);
 		doubleAceCheck(playerHand);// checks if player or dealer have two aces to start. one is automatically set
-		doubleAceCheck(splitHand);					// low if so.
+		doubleAceCheck(splitHand); // low if so.
 		doubleAceCheck(dealerHand);
 		if (!splitHand.isEmpty()) {
 			playerSplitTurn(splitHand, dealerHand, deck, money, betAmount, sc, deckSize);
@@ -83,7 +80,7 @@ public class BlackJackGame {
 	}
 
 	private void playerSplitTurn(List<Cards> splitHand, List<Cards> dealerHand, Deck deck, PlayerPurse money,
-			double betAmount, Scanner sc, int deckSize) {
+			double betAmount, Scanner sc, int deckSize) { //identical to player turn but only occurs if you got doubles and chose to split.
 		displayDealerFirstCard(dealerHand);
 		displayPlayerHand(splitHand);
 		System.out.println("What would you like to do next?\n1. Hit\n2. Stand");
@@ -101,7 +98,6 @@ public class BlackJackGame {
 					break;
 
 				} else {
-					displayPlayerHand(splitHand);
 					System.out.println("Hit again?\n1.Yes\n2.No");
 					choice = sc.nextInt();
 					sc.nextLine();
@@ -113,7 +109,7 @@ public class BlackJackGame {
 	}
 
 	private void splitHandCheck(List<Cards> playerHand, Scanner sc, List<Cards> splitHand, Deck deck, double betAmount,
-			PlayerPurse money) {
+			PlayerPurse money) { // If you got a double rank of cards you can split hands. You must lay down original bet again and have enough to do that to split.
 		if (playerHand.get(0).getRank() == playerHand.get(1).getRank()) {
 			for (Cards cards : playerHand) {
 				System.out.println("You have the " + cards.getRank() + " of " + cards.getSuit());
@@ -132,14 +128,12 @@ public class BlackJackGame {
 
 			} else if (money.getMoney() - betAmount < 0 && choice == 1) {
 				System.out.println("I am sorry, but you do not have enough money to split.");
-			} else {
-
-			}
+			} 
 		}
 
 	}
 
-	private void doubleAceCheck(List<Cards> playerHand) {
+	private void doubleAceCheck(List<Cards> playerHand) { //checks if player hands or dealer have double aces and autoshift before any plays.
 		int twoAcesCheck = calculateHandValue(playerHand);
 		if (twoAcesCheck == 22) {
 			Cards lowAce = new Cards(playerHand.get(0).getSuit(), Rank.ACELOW);
@@ -150,57 +144,58 @@ public class BlackJackGame {
 
 	private void determineWinner(List<Cards> dealerHand, List<Cards> playerHand, PlayerPurse money, double betAmount,
 			Scanner sc, Deck deck, int deckAmount, List<Cards> splitHand) {
-		int playerHandValue = calculateHandValue(playerHand);
+		int playerHandValue = calculateHandValue(playerHand); //gets hand values into ints for easy comparisons.
 		int dealerHandValue = calculateHandValue(dealerHand);
 		int splitHandValue = calculateHandValue(splitHand);
 		if (!splitHand.isEmpty()) {
-			if ((splitHandValue > dealerHandValue && splitHandValue < 22 ) || (splitHandValue < 21 && dealerHandValue > 21)) {
+			if ((splitHandValue > dealerHandValue && splitHandValue < 22)
+					|| (splitHandValue < 21 && dealerHandValue > 21)) {
 				System.out.println("Player Split Hand Wins!");
 				money.setMoney(money.getMoney() + (betAmount * 2));
-				System.out.println("You win $" + betAmount*2);
-			} else if (splitHandValue < dealerHandValue && dealerHandValue < 22) {
+				System.out.println("You win $" + betAmount * 2);
+			} else if ((splitHandValue < dealerHandValue && dealerHandValue < 22) || splitHandValue > 21) {
 				System.out.println("Dealer Wins! Maybe your other hand will win.");
-			} else {
+			} else if (dealerHandValue == splitHandValue && splitHandValue < 22) {
 				System.out.println("Push. You tied.");
 			}
 		}
-		if ((playerHandValue > dealerHandValue && playerHandValue < 22) || (playerHandValue < 21 && dealerHandValue > 21)) {
+		if ((playerHandValue > dealerHandValue && playerHandValue < 22)
+				|| (playerHandValue < 21 && dealerHandValue > 21)) {
 			System.out.println("Player Hand Wins!");
 			money.setMoney(money.getMoney() + (betAmount * 2));
-			System.out.println("You win $" + betAmount*2);
-			playAgain(money, deck, sc, deckAmount);
-		} else if (playerHandValue < dealerHandValue && dealerHandValue < 22) {
+			System.out.println("You win $" + betAmount * 2);
+		} else if ((playerHandValue < dealerHandValue && dealerHandValue < 22) || playerHandValue > 21) {
 			System.out.println("Dealer Wins! Better luck next time.");
-			if (money.getMoney() == 0) {
-				System.out.println("You're out of cash! Go hit up an ATM.");
-				sc.close();
-				System.exit(0);
-			} else {
-				playAgain(money, deck, sc, deckAmount);
-			}
-		} else {
+		} else if (playerHandValue == dealerHandValue) {
 			System.out.println("Push. You tied.");
+		}
+		if (money.getMoney() > 0) {
 			playAgain(money, deck, sc, deckAmount);
+		}
+		else {
+			System.out.println("You're out of Cash!\nGo hit up an ATM!");
+			sc.close();	//like an adult
+			System.exit(0); //if youre out of cash you cant play again.
 		}
 	}
 
 	private void playAgain(PlayerPurse money, Deck deck, Scanner sc, int deckAmount) {
 		System.out.println("You have: $" + money.getMoney());
-		System.out.println("Would you like to play again?\n1. Yes\2. No");
+		System.out.println("Would you like to play again?\n1. Yes\2. No"); // option to play again. Used to be spread throughout program, now just once after each round
 		int choice = sc.nextInt();
 		sc.nextLine();
 		if (choice == 1) {
 			startGame(money, sc, deck, deckAmount);
 		} else {
 			System.out.println("Thank you for playing!");
-			sc.close();
+			sc.close(); // like an adult
 			System.exit(0);
 		}
 	}
 
 	private void blackJack(List<Cards> playerHand, List<Cards> dealerHand, PlayerPurse money, double betAmount,
 			Scanner sc, Deck deck, int deckAmount) {
-		int playerHandValue = calculateHandValue(playerHand);
+		int playerHandValue = calculateHandValue(playerHand); // checks blackjack for player and dealer. Not split hand since not natural blackjack.
 		int dealerHandValue = calculateHandValue(dealerHand);
 		if (playerHandValue == 21 && dealerHandValue != 21) {
 			System.out.println("BLACKJACK! You win!");
@@ -229,8 +224,8 @@ public class BlackJackGame {
 	private void dealerTurn(List<Cards> dealerHand, Deck deck, PlayerPurse money, double betAmount, Scanner sc,
 			int deckAmount, List<Cards> splitHand) {
 		displayDealerHand(dealerHand);
-		int handValue = calculateHandValue(dealerHand);
-		//hitOn17Check(dealerHand);
+		int handValue = calculateHandValue(dealerHand); //dealer turn is same as players but automated so Has to hit if < 17
+		// hitOn17Check(dealerHand, deck);//Tried to initiate soft/hard 17 but ran into troubles and out of time.
 		if (handValue < 17) {
 			while (handValue < 17) {
 				System.out.println("Dealer hits.");
@@ -249,7 +244,19 @@ public class BlackJackGame {
 		}
 	}
 
-	private void displayDealerHand(List<Cards> dealerHand) {
+	// private void hitOn17Check(List<Cards> dealerHand, Deck deck) {
+	// if (calculateHandValue(dealerHand) == 17) {
+	// for (Cards cards : dealerHand) {
+	// if(cards.getRank() == Rank.ACE) {
+	// dealerHand.add(deck.dealCard());
+	// setAceComputer(dealerHand);
+	//
+	// }
+	// }
+	// }
+	// }
+
+	private void displayDealerHand(List<Cards> dealerHand) { // displays dealer full hand on dealer turn
 		int cardValue = 0;
 		for (int i = 0; i < dealerHand.size(); i++) {
 			System.out.println("The Dealer has the: " + dealerHand.get(i).toString());
@@ -261,15 +268,15 @@ public class BlackJackGame {
 	private void playerTurn(List<Cards> playerHand, List<Cards> dealerHand, Deck deck, PlayerPurse money,
 			double betAmount, Scanner sc, int deckAmount, List<Cards> splitHand) {
 		displayDealerFirstCard(dealerHand);
-		displayPlayerHand(playerHand);
-		System.out.println("What would you like to do next?\n1. Hit\n2. Stand");
+		displayPlayerHand(playerHand);//Player turn consists of seeing one dealer card and player cards. Then option to hit or stand
+		System.out.println("What would you like to do next?\n1. Hit\n2. Stand"); // stand ends turn, hit delivers another card.
 		int choice = sc.nextInt();
 		sc.nextLine();
-		do {
+		do {//do while loop for multiple hits and at least one run through.
 			if (choice == 1) {
-				Cards hit = deck.dealCard();
+				Cards hit = deck.dealCard(); 
 				playerHand.add(hit);
-				setAceComputer(playerHand);
+				setAceComputer(playerHand);// automated set ace check after every hit and before every bust check.
 				displayPlayerHand(playerHand);
 				int handValue = calculateHandValue(playerHand);
 				if (handValue > 21) {
@@ -296,25 +303,8 @@ public class BlackJackGame {
 
 	}
 
-	// private void setAce(List<Cards> playerHand, Scanner sc) {
-	// for (Cards cards : playerHand) {
-	// if (cards.getRank() == Rank.ACE || cards.getRank() == Rank.ACELOW) {
-	// System.out.println("Would you like to set your ace low or high?\n1. Low\n2.
-	// High");
-	// int choice = sc.nextInt();
-	// sc.nextLine();
-	// if (choice == 2) {
-	// cards.setRank(Rank.ACE);
-	// continue;
-	// } else {
-	// cards.setRank(Rank.ACELOW);
-	// }
-	// }
-	// }
-	// }
-
-	private void setAceComputer(List<Cards> playerHand) {
-		int computerHandValue = calculateHandValue(playerHand);
+	private void setAceComputer(List<Cards> playerHand) {// sets ace to low if hand value is over 21 and ace is present.
+		int computerHandValue = calculateHandValue(playerHand);//player used to have the option to set, but i realized it didnt matter to give them a choice
 		if (computerHandValue > 21) {
 			for (Cards cards : playerHand) {
 				if (cards.getRank() == Rank.ACE) {
@@ -329,7 +319,7 @@ public class BlackJackGame {
 
 	}
 
-	private void displayDealerFirstCard(List<Cards> dealerHand) {
+	private void displayDealerFirstCard(List<Cards> dealerHand) {//shows dealer first card
 		for (int i = 0; i < dealerHand.size() - 1; i++) {
 			System.out.println("The Dealer is showing: " + dealerHand.get(i).toString());
 		}
