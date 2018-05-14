@@ -13,7 +13,7 @@ public class BlackJackGame {
 
 	public BlackJackGame() {
 		Scanner sc = new Scanner(System.in);
-		System.out.println("Welcome to Casino Royale, we just play for your real fake money.");
+		System.out.println("Welcome to Casino Royale, we play for your real fake money.");
 		PlayerPurse gamblingMoney = new PlayerPurse(1000);
 		Deck deck = new Deck();
 		System.out.println("How many decks would you like to play with?");
@@ -37,7 +37,7 @@ public class BlackJackGame {
 		double betAmount = sc.nextInt();
 		sc.nextLine();
 		while (money.getMoney() - betAmount < 0) {
-			System.out.println("You can't bet more than you have!\nGive me a real bet.\n$");
+			System.out.print("You can't bet more than you have!\nGive me a real bet.\n$");
 			betAmount = sc.nextInt();
 			sc.nextLine();
 		}
@@ -154,7 +154,7 @@ public class BlackJackGame {
 				money.setMoney(money.getMoney() + (betAmount * 2));
 				System.out.println("You win $" + betAmount * 2);
 			} else if ((splitHandValue < dealerHandValue && dealerHandValue < 22) || splitHandValue > 21) {
-				System.out.println("Dealer Wins! Maybe your other hand will win.");
+				System.out.println("Dealer Wins Split Hand! Maybe your other hand will win.");
 			} else if (dealerHandValue == splitHandValue && splitHandValue < 22) {
 				System.out.println("Push. You tied.");
 			}
