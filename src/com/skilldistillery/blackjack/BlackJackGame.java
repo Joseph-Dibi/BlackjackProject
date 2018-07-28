@@ -8,6 +8,7 @@ import com.skilldistillery.pokerstuff.Cards;
 import com.skilldistillery.pokerstuff.Deck;
 import com.skilldistillery.pokerstuff.PlayerPurse;
 import com.skilldistillery.pokerstuff.Rank;
+import com.skilldistillery.pokerstuff.Suit;
 
 public class BlackJackGame {
 
@@ -185,7 +186,7 @@ public class BlackJackGame {
 		int choice = sc.nextInt();
 		sc.nextLine();
 		if (choice == 1) {
-			startGame(money, sc, deck, deckAmount);
+			startGame(money, sc, deck, deckAmount); // bad form, better to use boolean or something and have this up top so programs can finish.
 		} else {
 			System.out.println("Thank you for playing!");
 			sc.close(); // like an adult
